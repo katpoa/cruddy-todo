@@ -9,26 +9,37 @@ var items = {};
 
 exports.create = (text, callback) => {
   // var id = counter.getNextUniqueId();
-  counter.getNextUniqueId((err, counterId) => {
-    var newDir = path.join(`${counterId}`, 'counter.txt');
+  counter.getNextUniqueId((err, id) => {
+    // var newDir = exports.dataDir + '/' + id + 'txt';
+    // var newDir = `${exports.dataDir}/${id}.txt`;
+    var newDir = path.join(exports.dataDir, `${id}.txt`);
     fs.writeFile(newDir, text, (err) => {
     // create new file in dataDir named counterId
       if (err) {
         callback(err);
       } else {
-        callback(null, {counterId, text});
+        callback(null, {id, text});
       }
     });
   });
-  // items[id] = text;
-  // callback(null, { id, text });
 };
 
 exports.readAll = (callback) => {
-  var data = _.map(items, (text, id) => {
-    return { id, text };
+  fs.readdir(exports.dataDir, (err, items) => {
+    if (err) {
+      return callback(err);
+    }
+    var data = _.map(items, (item) => {
+      // /Users/pookapoa/Hack\Reactor/hrsf130-cruddy-todo/datastore/data/00001.txt
+      var id = path.basename(item, '.txt');
+      // fs.readFile(item, (itemData) => {
+      return {
+        id,
+        text: id };
+      // });
+    });
+    callback(null, data);
   });
-  callback(null, data);
 };
 
 exports.readOne = (id, callback) => {
